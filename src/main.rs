@@ -7,6 +7,8 @@ use std::f32::consts::PI;
 // CNN improved using AVX extensions &&/|| GPU
 use num_complex::Complex;
 
+/// Performs the FFT and IFFT over some polynomial using the
+/// Cooley-Tukey algorithm radix-2
 fn fft<const INVERSE: bool>(
     polynomial: Vec<Complex<f32>>,
 ) -> Result<Vec<Complex<f32>>, &'static str> {
@@ -20,20 +22,8 @@ fn fft<const INVERSE: bool>(
         return Ok(polynomial);
     }
 
-    //TODO: Think using step_by
-    let mut poly_even: Vec<_> = polynomial
-        .iter()
-        .enumerate()
-        .filter(|(pos, _)| pos.is_multiple_of(2))
-        .map(|(_, &val)| val)
-        .collect();
-
-    let mut poly_odd: Vec<_> = polynomial
-        .iter()
-        .enumerate()
-        .filter(|(pos, _)| !pos.is_multiple_of(2))
-        .map(|(_, &val)| val)
-        .collect();
+    let mut poly_even: Vec<_> = polynomial.iter().step_by(2).copied().collect();
+    let mut poly_odd: Vec<_> = polynomial.iter().skip(1).step_by(2).copied().collect();
 
     let sign = if INVERSE { -1.0 } else { 1.0 };
     let w_n = Complex::cis(sign * 2.0 * PI / n as f32);
