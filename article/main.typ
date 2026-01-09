@@ -123,16 +123,17 @@ If we factor out $x$ from $P_(o d d)(x)$ we get even powers for both, lets see a
   $
     P(x) = underbrace((1 + 5x^2 + x^4), P_"even") + x underbrace((4 + 3x^2 + 7x^4), P_"odd")
   $
+  Where the powers are even so we can consider each point $plus.minus x_i$ as it will be squared, this way we can evaluate in $n$ points as we will have $2n$ evaluations. The magic now comes in the way we can evaluate:
+  $
+    P(x_i) = P_(e v e n) (x_i)^2 + x_i P_(o d d)(x_i^2) \
+    P(-x_i) = P_(e v e n) (x_i)^2 - x_i P_(o d d)(x_i^2)
+  $
 ]
+As you can see, there is a lot of overlap so we can reuse some operations. Also note that for each evaluation we can repeat the recursive approach so we get our desired $O(n log n)$ approach.
 
+However there is one problem, once we have squared $x_i$ we have positive numbers so we cannot reuse our previous logic easily, the elegant solution comes from the complex numbers, where we can consider the complex radius-1 circle and some points of it which in other words are the roots of the equation $x^n = 1$
 
-
-The discrete Fourier transform is defined by the formula:
-$
-  X_k = sum_(n=0)^(N-1) x_n e^(-(2pi i )/N n k)
-$
-So we can find (at least in $O(N^2)$ operations) a polynomial that interpolates $p_1,p_2$, if we multiplied these two new polynomials in $n$ points we would get a new
-Fast Fourier Transform
+So we can define $w = e^((pi i)/n )$ which would define each step over the radius-1 circle and evaluate at the point, also using the simmetry
 
 
 #bibliography("bibliography.bib")
