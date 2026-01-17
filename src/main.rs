@@ -1,4 +1,5 @@
 use std::f32::consts::PI;
+mod mnist;
 
 // Search for complex number crates in rust or implement one
 // FFT algorithm implementation
