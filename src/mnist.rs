@@ -106,3 +106,14 @@ fn read_u32_be(reader: &mut dyn Read) -> Result<u32, String> {
         .map_err(|e| format!("Failed to read u32: {}", e))?;
     Ok(u32::from_be_bytes(buf))
 }
+
+pub fn download_instructions() -> &'static str {
+    r#"
+MNIST dataset not found. Please run the following command:
+    mkdir data && cd data
+    wget https://storage.googleapis.com/cvdf-datasets/mnist/train-images-idx3-ubyte.gz
+    wget https://storage.googleapis.com/cvdf-datasets/mnist/train-labels-idx1-ubyte.gz
+    wget https://storage.googleapis.com/cvdf-datasets/mnist/t10k-images-idx3-ubyte.gz
+    wget https://storage.googleapis.com/cvdf-datasets/mnist/t10k-labels-idx1-ubyte.gz
+"#
+}
