@@ -1,9 +1,52 @@
+use crate::{
+    mnist::{MnistDataset, download_instructions},
+    network::Network,
+};
 use num_complex::Complex;
+use std::path::Path;
 
 mod fft;
 mod mnist;
+mod network;
 
-fn main() -> Result<(), &'static str> {
+const WELCOME_STRING: &str = "
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                    MNIST-CNN with FFT-based Convolutions                     ║
+║                              Author: Miguevrgo                               ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+";
+
+fn main() {
+    println!("\x1b[1;33m {WELCOME_STRING} \x1b[0m");
+    println!("[+] Loading MNIST dataset...");
+
+    let training_data = match MnistDataset::load::<true>(Path::new("./data")) {
+        Ok(data) => {
+            println!("\t Training samples: {}", data.num_samples);
+            data
+        }
+        Err(e) => {
+            eprintln!("\t Error loading training data: {e}");
+            eprintln!("{}", download_instructions());
+            return;
+        }
+    };
+
+    let test_data = match MnistDataset::load::<false>(Path::new("./data")) {
+        Ok(data) => {
+            println!("\t Test samples: {}", data.num_samples);
+            data
+        }
+        Err(e) => {
+            eprintln!("\t Error loading test data: {e}");
+            eprintln!("{}", download_instructions());
+            return;
+        }
+    };
+
+    println!("[+] Creating neural network");
+    let mut network = Network::new();
+
     let pol_1 = [3, 4, 5, 5, 2, 3, 0, 7];
     let pol_2 = [5, 2, 3, 1, 6, 0, 2, 7];
 
@@ -15,12 +58,12 @@ fn main() -> Result<(), &'static str> {
     c1.resize(target_size, Complex::new(0.0, 0.0));
     c2.resize(target_size, Complex::new(0.0, 0.0));
 
-    let f1 = fft::fft::<false>(c1)?;
-    let f2 = fft::fft::<false>(c2)?;
+    let f1 = fft::fft::<false>(c1).expect("Unable to compute fft for pol_1");
+    let f2 = fft::fft::<false>(c2).expect("Unable to compute fft for pol_2");
 
     let multiplied: Vec<_> = f1.iter().zip(f2.iter()).map(|(a, b)| a * b).collect();
 
-    let inv = fft::fft::<true>(multiplied)?;
+    let inv = fft::fft::<true>(multiplied).expect("Unable to compute inverse fft");
 
     let n = target_size as f32;
     let result: Vec<_> = inv
@@ -30,5 +73,4 @@ fn main() -> Result<(), &'static str> {
         .collect();
 
     println!("{:?}", result);
-    Ok(())
 }

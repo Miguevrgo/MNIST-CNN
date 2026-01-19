@@ -22,8 +22,8 @@ impl MnistDataset {
     pub fn load<const TRAIN: bool>(dir: &Path) -> Result<Self, String> {
         let prefix = if TRAIN { "train" } else { "t10k" };
 
-        let images_file = dir.join(format!("{prefix}-images-idx3-ubyte"));
-        let labels_file = dir.join(format!("{prefix}-labels-idx3-ubyte"));
+        let images_file = dir.join(format!("./data/{prefix}-images-idx3-ubyte"));
+        let labels_file = dir.join(format!("./data/{prefix}-labels-idx3-ubyte"));
 
         let images = load_images(&images_file)?;
         let labels = load_labels(&labels_file)?;
