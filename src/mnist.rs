@@ -22,8 +22,8 @@ impl MnistDataset {
     pub fn load<const TRAIN: bool>(dir: &Path) -> Result<Self, String> {
         let prefix = if TRAIN { "train" } else { "t10k" };
 
-        let images_file = dir.join(format!("./data/{prefix}-images-idx3-ubyte"));
-        let labels_file = dir.join(format!("./data/{prefix}-labels-idx3-ubyte"));
+        let images_file = dir.join(format!("{prefix}-images-idx3-ubyte.gz"));
+        let labels_file = dir.join(format!("{prefix}-labels-idx1-ubyte.gz"));
 
         let images = load_images(&images_file)?;
         let labels = load_labels(&labels_file)?;
@@ -41,7 +41,7 @@ impl MnistDataset {
 fn load_images(path: &PathBuf) -> Result<Tensor, String> {
     let file = File::open(path).map_err(|e| format!("Failed to open {path:?}: {e}"))?;
 
-    let mut reader: Box<dyn Read> = if path.ends_with(".gz") {
+    let mut reader: Box<dyn Read> = if path.extension().is_some_and(|ext| ext == "gz") {
         Box::new(GzDecoder::new(BufReader::new(file)))
     } else {
         Box::new(BufReader::new(file))
@@ -75,7 +75,7 @@ fn load_images(path: &PathBuf) -> Result<Tensor, String> {
 fn load_labels(path: &PathBuf) -> Result<Tensor, String> {
     let file = File::open(path).map_err(|e| format!("Failed to open {path:?}: {e}"))?;
 
-    let mut reader: Box<dyn Read> = if path.ends_with(".gz") {
+    let mut reader: Box<dyn Read> = if path.extension().map_or(false, |ext| ext == "gz") {
         Box::new(GzDecoder::new(BufReader::new(file)))
     } else {
         Box::new(BufReader::new(file))
