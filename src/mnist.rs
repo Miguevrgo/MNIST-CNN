@@ -6,11 +6,7 @@ use std::{
 
 use flate2::bufread::GzDecoder;
 
-#[derive(Debug, Clone)]
-pub struct Tensor {
-    pub data: Vec<f32>,
-    pub shape: Vec<usize>,
-}
+use crate::tensor::Tensor;
 
 pub struct MnistDataset {
     pub images: Tensor,

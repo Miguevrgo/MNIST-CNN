@@ -6,8 +6,10 @@ use num_complex::Complex;
 use std::path::Path;
 
 mod fft;
+mod layer;
 mod mnist;
 mod network;
+mod tensor;
 
 const WELCOME_STRING: &str = "
 ╔══════════════════════════════════════════════════════════════════════════════╗
