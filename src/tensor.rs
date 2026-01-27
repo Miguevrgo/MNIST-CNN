@@ -82,4 +82,106 @@ impl Tensor {
             shape: vec![self.data.len()],
         }
     }
+
+    pub fn add(&self, other: &Tensor) -> Result<Tensor, &'static str> {
+        if self.shape != other.shape {
+            return Err("Shapes must match for addition");
+        }
+        let data: Vec<f32> = self
+            .data
+            .iter()
+            .zip(other.data.iter())
+            .map(|(a, b)| a + b)
+            .collect();
+        Ok(Tensor {
+            data,
+            shape: self.shape.clone(),
+        })
+    }
+
+    pub fn sub(&self, other: &Tensor) -> Result<Tensor, &'static str> {
+        if self.shape != other.shape {
+            return Err("Shapes must match for substraction");
+        }
+        let data: Vec<f32> = self
+            .data
+            .iter()
+            .zip(other.data.iter())
+            .map(|(a, b)| a - b)
+            .collect();
+        Ok(Tensor {
+            data,
+            shape: self.shape.clone(),
+        })
+    }
+
+    /// Performs the Hadamard product
+    pub fn mul(&self, other: &Tensor) -> Result<Tensor, &'static str> {
+        if self.shape != other.shape {
+            return Err("Shapes must match for multiplication");
+        }
+        let data: Vec<f32> = self
+            .data
+            .iter()
+            .zip(other.data.iter())
+            .map(|(a, b)| a * b)
+            .collect();
+        Ok(Tensor {
+            data,
+            shape: self.shape.clone(),
+        })
+    }
+
+    pub fn div(&self, other: &Tensor) -> Result<Tensor, &'static str> {
+        if self.shape != other.shape {
+            return Err("Shapes must match for substraction");
+        }
+        let data: Vec<f32> = self
+            .data
+            .iter()
+            .zip(other.data.iter())
+            .map(|(a, b)| a / b)
+            .collect();
+        Ok(Tensor {
+            data,
+            shape: self.shape.clone(),
+        })
+    }
+
+    pub fn scale(&self, scalar: f32) -> Tensor {
+        let data = self.data.iter().map(|&elem| elem * scalar).collect();
+
+        Tensor {
+            data,
+            shape: self.shape.clone(),
+        }
+    }
+
+    pub fn sum(&self) -> f32 {
+        return self.data.iter().sum();
+    }
+
+    pub fn map<F>(&self, f: F) -> Tensor
+    where
+        F: Fn(f32) -> f32,
+    {
+        let data: Vec<f32> = self.data.iter().map(|&x| f(x)).collect();
+        Tensor {
+            data,
+            shape: self.shape.clone(),
+        }
+    }
+
+    pub fn relu(&self) -> Tensor {
+        self.map(|x| x.max(0.0))
+    }
+
+    /// Clipped ReLU
+    pub fn crelu(&self) -> Tensor {
+        self.map(|x| x.max(0.0).min(1.0))
+    }
+
+    pub fn tanh(&self) -> Tensor {
+        self.map(|x| x.tanh())
+    }
 }
