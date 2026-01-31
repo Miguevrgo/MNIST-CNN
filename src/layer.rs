@@ -41,7 +41,10 @@ impl Conv2D<true> {
         stride: usize,
         padding: usize,
     ) -> Self {
-        let weights;
+        let weights = Tensor::he(&[kernel_size, kernel_size, depth, num_filters]);
+        let bias = Tensor::zeros(&[num_filters]);
+        let grad_weights = Tensor::zeros(&[kernel_size, kernel_size, depth, num_filters]);
+        let grad_bias = Tensor::zeros(&[num_filters]);
         Self {
             depth,
             num_filters,

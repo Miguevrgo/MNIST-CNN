@@ -1,3 +1,5 @@
+use std::ops::{Index, IndexMut};
+
 use rand_distr::{Distribution, Normal};
 
 /// A multi-dimensional tensor for neural network computations
@@ -181,7 +183,25 @@ impl Tensor {
         self.map(|x| x.max(0.0).min(1.0))
     }
 
+    /// Squared Crelu
+    pub fn screlu(&self) -> Tensor {
+        self.map(|x| x.max(0.0).min(1.0).powi(2))
+    }
+
     pub fn tanh(&self) -> Tensor {
         self.map(|x| x.tanh())
+    }
+}
+
+impl Index<usize> for Tensor {
+    type Output = f32;
+    fn index(&self, idx: usize) -> &Self::Output {
+        &self.data[idx]
+    }
+}
+
+impl IndexMut<usize> for Tensor {
+    fn index_mut(&mut self, idx: usize) -> &mut Self::Output {
+        &mut self.data[idx]
     }
 }
