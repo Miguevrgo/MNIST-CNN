@@ -24,4 +24,12 @@ impl Network {
         }
         grad
     }
+
+    pub fn backward(&mut self, grad_output: &Tensor) -> Tensor {
+        let mut grad = grad_output.clone();
+        for layer in &mut self.layers {
+            grad = layer.backward(&grad);
+        }
+        grad
+    }
 }

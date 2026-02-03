@@ -9,6 +9,7 @@ mod fft;
 mod layer;
 mod mnist;
 mod network;
+mod optimizer;
 mod tensor;
 
 const WELCOME_STRING: &str = "
