@@ -66,6 +66,10 @@ impl Tensor {
         }
     }
 
+    pub fn len(&self) -> usize {
+        self.data.len()
+    }
+
     pub fn reshape(&self, new_shape: &[usize]) -> Result<Tensor, &'static str> {
         let n_size = new_shape.iter().product();
         if self.data.len() != n_size {

@@ -2,22 +2,18 @@ use crate::{layer::Layer, tensor::Tensor};
 
 pub struct Network {
     pub layers: Vec<Box<dyn Layer>>,
-    training: bool,
 }
 
 impl Network {
     pub fn new() -> Self {
-        Network {
-            layers: Vec::new(),
-            training: false,
-        }
+        Network { layers: Vec::new() }
     }
 
-    fn add<L: Layer + 'static>(&mut self, layer: L) {
+    pub fn add<L: Layer + 'static>(&mut self, layer: L) {
         self.layers.push(Box::new(layer))
     }
 
-    fn forward(&mut self, output: &Tensor) -> Tensor {
+    pub fn forward(&mut self, output: &Tensor) -> Tensor {
         let mut grad = output.clone();
         for layer in &mut self.layers {
             grad = layer.forward(&grad)
@@ -27,7 +23,7 @@ impl Network {
 
     pub fn backward(&mut self, grad_output: &Tensor) -> Tensor {
         let mut grad = grad_output.clone();
-        for layer in &mut self.layers {
+        for layer in self.layers.iter_mut().rev() {
             grad = layer.backward(&grad);
         }
         grad

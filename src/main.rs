@@ -1,4 +1,5 @@
 use crate::{
+    layer::Conv2D,
     mnist::{MnistDataset, download_instructions},
     network::Network,
 };
@@ -18,6 +19,10 @@ const WELCOME_STRING: &str = "
 ║                              Author: Miguevrgo                               ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 ";
+const BATCH_SIZE: usize = 32;
+const EPOCHS: usize = 5;
+const LEARNING_RATE: f32 = 0.01;
+const MOMENTUM: f32 = 0.9;
 
 fn main() {
     println!("\x1b[1;33m {WELCOME_STRING} \x1b[0m");
@@ -47,33 +52,27 @@ fn main() {
         }
     };
 
-    println!("[+] Creating neural network");
+    // ── Build network ──
+    // Architecture: Conv(1->8, 3x3) -> ReLU -> MaxPool(2)
+    //             -> Conv(8->16, 3x3) -> ReLU -> MaxPool(2)
+    //             -> Flatten -> Dense(400, 128) -> ReLU -> Dense(128, 10)
+    //
+    // Input:  [B, 1, 28, 28]
+    // Conv1:  [B, 8, 26, 26]  (28-3+1=26)
+    // Pool1:  [B, 8, 13, 13]
+    // Conv2:  [B, 16, 11, 11] (13-3+1=11)
+    // Pool2:  [B, 16, 5, 5]   (11/2=5)
+    // Flat:   [B, 400]
+    // Dense1: [B, 128]
+    // Dense2: [B, 10]
+    //
+    // Conv2D<true> uses FFT convolution, Conv2D<false> uses direct convolution.
+    // For small 3x3 kernels on 28x28 images, direct is faster, but FFT is here
+    // to demonstrate the algorithm. Use Conv2D<true> for the first layer as a demo.
+
+    println!("[+] Building network...");
     let mut network = Network::new();
 
-    let pol_1 = [3, 4, 5, 5, 2, 3, 0, 7];
-    let pol_2 = [5, 2, 3, 1, 6, 0, 2, 7];
-
-    let target_size = (pol_1.len() + pol_2.len() - 1).next_power_of_two();
-
-    let mut c1: Vec<_> = pol_1.iter().map(|&v| Complex::new(v as f32, 0.0)).collect();
-    let mut c2: Vec<_> = pol_2.iter().map(|&v| Complex::new(v as f32, 0.0)).collect();
-
-    c1.resize(target_size, Complex::new(0.0, 0.0));
-    c2.resize(target_size, Complex::new(0.0, 0.0));
-
-    let f1 = fft::fft::<false>(c1).expect("Unable to compute fft for pol_1");
-    let f2 = fft::fft::<false>(c2).expect("Unable to compute fft for pol_2");
-
-    let multiplied: Vec<_> = f1.iter().zip(f2.iter()).map(|(a, b)| a * b).collect();
-
-    let inv = fft::fft::<true>(multiplied).expect("Unable to compute inverse fft");
-
-    let n = target_size as f32;
-    let result: Vec<_> = inv
-        .iter()
-        .take(pol_1.len() + pol_2.len() - 1)
-        .map(|c| (c.re / n).round() as i32)
-        .collect();
-
-    println!("{:?}", result);
+    network.add(Conv2D::<true>::new(1, 8, 3, 1, 0));
+    network.add(ReLu::new());
 }
