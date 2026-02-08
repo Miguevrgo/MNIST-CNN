@@ -52,7 +52,7 @@ fn load_images(path: &PathBuf) -> Result<Tensor, String> {
     let rows = read_u32_be(&mut reader)? as usize;
     let cols = read_u32_be(&mut reader)? as usize;
 
-    if rows & cols != 28 {
+    if rows != 28 || cols != 28 {
         return Err(format!("Unexpected image dimensiones: {rows}x{cols}"));
     }
 
